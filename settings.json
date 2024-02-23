@@ -1,0 +1,386 @@
+{
+  "B2B": {
+    "BUDGET": {
+      "Success Rate to Bonus Pool": [
+        [
+          97,
+          100
+        ],
+        [
+          94,
+          75
+        ],
+        [
+          92,
+          40
+        ]
+      ],
+      "Max Bonus Pool Bucket": [
+        [
+          "2024-01-01",
+          "2024-01-31",
+          500
+        ],
+        [
+          "2024-02-01",
+          "2024-02-29",
+          500
+        ],
+        [
+          "2024-03-01",
+          "2024-03-31",
+          2500
+        ],
+        [
+          "2024-04-01",
+          "2024-04-30",
+          1500
+        ],
+        [
+          "2024-05-01",
+          "2024-05-31",
+          2500
+        ],
+        [
+          "2024-06-01",
+          "2024-06-30",
+          3500
+        ],
+        [
+          "2024-07-01",
+          "2024-07-31",
+          3000
+        ],
+        [
+          "2024-08-01",
+          "2024-08-31",
+          2500
+        ],
+        [
+          "2024-09-01",
+          "2024-09-30",
+          1500
+        ],
+        [
+          "2024-10-01",
+          "2024-10-31",
+          1500
+        ],
+        [
+          "2024-11-01",
+          "2024-11-30",
+          500
+        ],
+        [
+          "2024-12-01",
+          "2024-12-31",
+          500
+        ]
+      ]
+    },
+    "STAFF": {
+      "Role to Number in Role to Disbursement": [
+        [
+          "General Manager",
+          "1",
+          0.28
+        ],
+        [
+          "Manager / Team Lead",
+          "1",
+          0.18
+        ],
+        [
+          "Logisitcs",
+          "2",
+          0.15
+        ],
+        [
+          "Driver",
+          "12",
+          0.39
+        ]
+      ]
+    },
+    "DISPATCH": {
+      "Required": [
+        "BACKPACK & BIKE CHECK",
+        "BACKPACK & BIKE CHECK - OWNER ARRIVAL",
+        "BIKE AUDIT",
+        "BIKE CHECK",
+        "BIKE CHECK - ALAYA",
+        "BIKE CHECK - OWNER ARRIVA",
+        "BIKE CHECK - OWNER ARRIVAL",
+        "DELIVERY",
+        "PICKUP",
+        "POINTE ARRIVAL",
+        "POINTE DEPARTURE",
+        "SWAP",
+        "TUNE"
+      ],
+      "Irrelevant": [
+        "ABANDONED",
+        "BEACH SERVICE SET UP",
+        "GART CHECK",
+        "GART CHECK - ALAYA",
+        "GART CHECK - OWNER ARRIVA",
+        "GART CHECK - OWNER ARRIVAL",
+        "GART FIX",
+        "MISC ERRAND"
+      ]
+    }
+  },
+  "B2C": {
+    "BUDGET": {
+      "Success Rate to Bonus Pool": [
+        [
+          97,
+          100
+        ],
+        [
+          94,
+          75
+        ],
+        [
+          92,
+          40
+        ]
+      ],
+      "Max Bonus Pool Bucket": [
+        [
+          "2024-01-01",
+          "2024-01-31",
+          500
+        ],
+        [
+          "2024-02-01",
+          "2024-02-29",
+          500
+        ],
+        [
+          "2024-03-01",
+          "2024-03-31",
+          2500
+        ],
+        [
+          "2024-04-01",
+          "2024-04-30",
+          1500
+        ],
+        [
+          "2024-05-01",
+          "2024-05-31",
+          2500
+        ],
+        [
+          "2024-06-01",
+          "2024-06-30",
+          3500
+        ],
+        [
+          "2024-07-01",
+          "2024-07-31",
+          3000
+        ],
+        [
+          "2024-08-01",
+          "2024-08-31",
+          2500
+        ],
+        [
+          "2024-09-01",
+          "2024-09-30",
+          1500
+        ],
+        [
+          "2024-10-01",
+          "2024-10-31",
+          1500
+        ],
+        [
+          "2024-11-01",
+          "2024-11-30",
+          500
+        ],
+        [
+          "2024-12-01",
+          "2024-12-31",
+          500
+        ]
+      ]
+    },
+    "STAFF": {
+      "Role to Number in Role to Disbursement": [
+        [
+          "General Manager",
+          "1",
+          0.28
+        ],
+        [
+          "Manager / Team Lead",
+          "3",
+          0.18
+        ],
+        [
+          "Logisitcs",
+          "2",
+          0.15
+        ],
+        [
+          "Driver",
+          "10",
+          0.39
+        ]
+      ]
+    },
+    "DISPATCH": {
+      "Required": [
+        "DELIVERY",
+        "PICKUP",
+        "SWAP"
+      ],
+      "Irrelevant": [
+        "ABANDONED",
+        "BACKPACK & BIKE CHECK",
+        "BACKPACK & BIKE CHECK - OWNER ARRIVAL",
+        "BEACH SERVICE SET UP",
+        "BIKE AUDIT",
+        "BIKE CHECK - ALAYA",
+        "BIKE CHECK - OWNER ARRIVA",
+        "BIKE CHECK - OWNER ARRIVAL",
+        "GART CHECK",
+        "GART CHECK - ALAYA",
+        "GART CHECK - OWNER ARRIVA",
+        "GART CHECK - OWNER ARRIVAL",
+        "GART FIX",
+        "MISC ERRAND",
+        "POINTE ARRIVAL",
+        "POINTE DEPARTURE",
+        "TUNE"
+      ]
+    }
+  },
+  "LSV": {
+    "BUDGET": {
+      "Projected": [
+        [
+          "2023-01-01",
+          "2023-01-31",
+          16000
+        ],
+        [
+          "2023-02-01",
+          "2023-02-28",
+          4000
+        ],
+        [
+          "2023-03-01",
+          "2023-03-31",
+          44000
+        ],
+        [
+          "2023-04-01",
+          "2023-04-30",
+          62000
+        ],
+        [
+          "2023-05-01",
+          "2023-05-31",
+          96000
+        ],
+        [
+          "2023-06-01",
+          "2023-06-30",
+          132000
+        ],
+        [
+          "2023-07-01",
+          "2023-07-31",
+          176000
+        ],
+        [
+          "2023-08-01",
+          "2023-08-31",
+          124000
+        ],
+        [
+          "2023-09-01",
+          "2023-09-30",
+          62000
+        ],
+        [
+          "2023-10-01",
+          "2023-10-31",
+          44000
+        ],
+        [
+          "2023-11-01",
+          "2023-11-30",
+          10000
+        ],
+        [
+          "2023-12-01",
+          "2023-12-31",
+          11000
+        ]
+      ],
+      "Actual": [],
+      "Disbursement Percentage": [
+        0.1
+      ]
+    },
+    "STAFF": {
+      "Role to Number in Role to Disbursement": [
+        [
+          "General Manager",
+          "1",
+          0.35
+        ],
+        [
+          "Manager / Team Lead",
+          "1",
+          0.2
+        ],
+        [
+          "Logisitcs",
+          "1",
+          0.1
+        ],
+        [
+          "Driver",
+          "8",
+          0.35
+        ]
+      ]
+    },
+    "DISPATCH": null
+  },
+  "SALES": {
+    "BUDGET": {},
+    "STAFF": {
+      "Role to Number in Role to Disbursement": [
+        [
+          "General Manager",
+          "1",
+          0.28
+        ],
+        [
+          "Manager / Team Lead",
+          "1",
+          0.18
+        ],
+        [
+          "Logisitcs",
+          "1",
+          0.15
+        ],
+        [
+          "Agent",
+          "8",
+          0.39
+        ]
+      ]
+    },
+    "DISPATCH": null
+  }
+}
