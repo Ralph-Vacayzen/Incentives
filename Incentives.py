@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 
 
+
+
 st.set_page_config(page_title='Incentives', page_icon='💰', layout="wide", initial_sidebar_state="auto", menu_items=None)
 
 st.caption('VACAYZEN')
@@ -34,6 +36,8 @@ with st.expander('Files'):
         help='These order numbers will be the only orders considered in terms of activity in this analysis.')
 
 
+
+
 if house_agreements is not None and dispatches is not None and prepayments is not None:
 
     dha = pd.read_csv(house_agreements)
@@ -45,10 +49,10 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
     def IsBS(row):
-        return row.Product == 'Beach Services' or row.DeliverOrPickupToType == 'BEACH SERVICE SET UP'
+        return row.Product == 'Beach Services' or row.DeliverOrPickupToType == 'BEACH SERVICE SET UP' # TODO: Implement beach service logic
 
     def IsLSV(row):
-        return row.Product == 'Golf Cart Rentals'
+        return (row.Product == 'Golf Cart Rentals') or (row.DeliverOrPickupToType in settings['LSV']['DISPATCH']['SPECIFIC'])
 
     def IsB2B(row):
         isNotBS  = not (row.isBS)
@@ -61,7 +65,11 @@ if house_agreements is not None and dispatches is not None and prepayments is no
         return not (row.isBS or row.isLSV or row.isB2B)
     
     def IsIgnore(row):
-        return row.DeliverOrPickupToType == 'ABANDONED' or row.DeliverOrPickupToType == 'MISC ERRAND'
+        ignoreList = ['ABANDONED', 'MISC ERRAND']
+
+        return row.DeliverOrPickupToType in ignoreList
+
+
 
     dda['isBS']     = dda.apply(IsBS,  axis=1)
     dda['isLSV']    = dda.apply(IsLSV, axis=1)
@@ -69,6 +77,42 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     dda['isB2C']    = dda.apply(IsB2C, axis=1)
     dda['isIgnore'] = dda.apply(IsIgnore, axis=1)
 
-    print(dda.DeliverOrPickupToType.unique())
+    dda = dda[~dda['isIgnore']]
+    dda = dda.drop(columns=['isIgnore'])
+
+
+
+    timestamps = {
+        'LSV': {},
+        'B2B': {},
+        'B2C': {}
+    }
+
+
+
+    def IdentifyTimestamps(row):
+
+        department = None
+
+        if   row.isLSV: department = 'LSV'
+        elif row.isB2B: department = 'B2B'
+        elif row.isB2C: department = 'B2C'
+
+        if department == None: return
+
+        if row.DeliverOrPickupToType in settings[department]['DISPATCH']['TIMESTAMP']:
+            if row.RentalAgreementID not in timestamps[department]:
+                timestamps[department][row.RentalAgreementID] = set()
+                timestamps[department][row.RentalAgreementID].add(row.Dispatch)
+            else:
+                timestamps[department][row.RentalAgreementID].add(row.Dispatch)
+
+
+
+    dda.apply(IdentifyTimestamps, axis=1)
+
+    timestamps
+
+    # def IdentifyAdditionalWork(row): TODO
 
     st.dataframe(dda, use_container_width=True, hide_index=True)

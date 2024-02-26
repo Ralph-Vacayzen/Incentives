@@ -99,7 +99,7 @@
       ]
     },
     "DISPATCH": {
-      "Required": [
+      "REQUIRED": [
         "BACKPACK & BIKE CHECK",
         "BACKPACK & BIKE CHECK - OWNER ARRIVAL",
         "BIKE AUDIT",
@@ -114,7 +114,7 @@
         "SWAP",
         "TUNE"
       ],
-      "Timestamp": [
+      "TIMESTAMP": [
         "BACKPACK & BIKE CHECK",
         "BACKPACK & BIKE CHECK - OWNER ARRIVAL",
         "BIKE CHECK",
@@ -226,12 +226,12 @@
       ]
     },
     "DISPATCH": {
-      "Required": [
+      "REQUIRED": [
         "DELIVERY",
         "PICKUP",
         "SWAP"
       ],
-      "Timestamp": [
+      "TIMESTAMP": [
         "DELIVERY"
       ]
     }
@@ -336,19 +336,24 @@
       ]
     },
     "DISPATCH": {
-      "Required": [
+      "REQUIRED": [
         "DELIVERY",
         "PICKUP",
-        "SWAP",
         "GART CHECK",
         "GART CHECK - OWNER ARRIVAL",
         "GART CHECK - ALAYA"
       ],
-      "Timestamp": [
+      "TIMESTAMP": [
         "DELIVERY",
         "GART CHECK",
         "GART CHECK - OWNER ARRIVAL",
         "GART CHECK - ALAYA"
+      ],
+      "SPECIFIC": [
+        "GART CHECK",
+        "GART CHECK - OWNER ARRIVAL",
+        "GART CHECK - ALAYA",
+        "GART FIX"
       ]
     }
   },
