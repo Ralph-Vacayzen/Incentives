@@ -151,3 +151,20 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
     with st.expander('Showing the work'):
         st.dataframe(dda, use_container_width=True, hide_index=True)
+    
+    LSV = dda[dda.isLSV]
+    B2B = dda[dda.isB2B]
+    B2C = dda[dda.isB2C]
+
+    st.subheader('Efficiency')
+
+    st.write('**LSV**')
+    with st.container(border=True):
+        eLSVrequired   = np.count_nonzero(LSV.isRequiredWork)
+        eLSVerror      = np.count_nonzero(LSV.isError)
+        # eLSVefficiency = TODO
+
+        l, m, r = st.columns(3)
+        l.metric('Required Stops', np.count_nonzero(LSV.isRequiredWork))
+        m.metric('Additional (Error) Stops', np.count_nonzero(LSV.isError))
+        r.metric('**Efficiency**',)
