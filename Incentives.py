@@ -46,8 +46,8 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
     def IsBS(row):
-        return (row.Product == 'Beach Services') or (row.DeliverOrPickupToType == 'BEACH SERVICE SET UP') # TODO: Implement beach service logic
-
+        return (row.Product == 'Beach Services') or (row.DeliverOrPickupToType == 'BEACH SERVICE SET UP')
+    
     def IsLSV(row):
         return (row.Product == 'Golf Cart Rentals') or (row.DeliverOrPickupToType in settings['LSV']['DISPATCH']['SPECIFIC'])
 
@@ -123,6 +123,11 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
         if department == None: return False
 
+        attempts = ['AT2','AT3','AT4','AT5','AT6','AT7','AT8','AT9']
+
+        if any(attempt in str(row.Comment).upper() for attempt in attempts):
+            return True
+
         if row.isAdditionalWork and row.RentalAgreementID in timestamps[department]:
             if   row.Dispatch                             in timestamps[department][row.RentalAgreementID]: return True
             elif row.Dispatch - pd.Timedelta(days=1)      in timestamps[department][row.RentalAgreementID]: return True
@@ -149,22 +154,44 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     dda['isError']          = dda.apply(IsError,          axis=1)
 
 
-    with st.expander('Showing the work'):
+    with st.expander('**Dispatch Analysis**'):
         st.dataframe(dda, use_container_width=True, hide_index=True)
     
     LSV = dda[dda.isLSV]
     B2B = dda[dda.isB2B]
     B2C = dda[dda.isB2C]
 
-    st.subheader('Efficiency')
+    with st.expander('**Efficiency**'):
 
-    st.write('**LSV**')
-    with st.container(border=True):
-        eLSVrequired   = np.count_nonzero(LSV.isRequiredWork)
-        eLSVerror      = np.count_nonzero(LSV.isError)
-        # eLSVefficiency = TODO
+        st.write('**LSV**')
+        with st.container(border=True):
+            LSVrequired   = np.count_nonzero(LSV.isRequiredWork)
+            LSVerror      = np.count_nonzero(LSV.isError)
+            LSVefficiency = 1 - LSVerror / LSVrequired
 
-        l, m, r = st.columns(3)
-        l.metric('Required Stops', np.count_nonzero(LSV.isRequiredWork))
-        m.metric('Additional (Error) Stops', np.count_nonzero(LSV.isError))
-        r.metric('**Efficiency**',)
+            l, m, r = st.columns(3)
+            l.metric('Required Stops',           LSVrequired)
+            m.metric('Additional (Error) Stops', LSVerror)
+            r.metric('**Efficiency**',           round(LSVefficiency,3))
+        
+        st.write('**B2B**')
+        with st.container(border=True):
+            B2Brequired   = np.count_nonzero(B2B.isRequiredWork)
+            B2Berror      = np.count_nonzero(B2B.isError)
+            B2Befficiency = 1 - B2Berror / B2Brequired
+
+            l, m, r = st.columns(3)
+            l.metric('Required Stops',           B2Brequired)
+            m.metric('Additional (Error) Stops', B2Berror)
+            r.metric('**Efficiency**',           round(B2Befficiency,3))
+        
+        st.write('**B2C**')
+        with st.container(border=True):
+            B2Crequired   = np.count_nonzero(B2C.isRequiredWork)
+            B2Cerror      = np.count_nonzero(B2C.isError)
+            B2Cefficiency = 1 - B2Cerror / B2Crequired
+
+            l, m, r = st.columns(3)
+            l.metric('Required Stops',           B2Crequired)
+            m.metric('Additional (Error) Stops', B2Cerror)
+            r.metric('**Efficiency**',           round(B2Cefficiency,3))
