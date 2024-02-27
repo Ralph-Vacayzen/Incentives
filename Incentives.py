@@ -168,15 +168,29 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     B2B = dda[dda.isB2B]
     B2C = dda[dda.isB2C]
 
-    LSVrequired   = np.count_nonzero(LSV.isRequiredWork)
-    B2Brequired   = np.count_nonzero(B2B.isRequiredWork)
-    B2Crequired   = np.count_nonzero(B2C.isRequiredWork)
-    LSVerror      = np.count_nonzero(LSV.isError)
-    B2Berror      = np.count_nonzero(B2B.isError)
-    B2Cerror      = np.count_nonzero(B2C.isError)
-    LSVefficiency = 1 - LSVerror / LSVrequired
-    B2Befficiency = 1 - B2Berror / B2Brequired
-    B2Cefficiency = 1 - B2Cerror / B2Crequired
+    results = {
+        'LSV': {
+            'required':   np.count_nonzero(LSV.isRequiredWork),
+            'error':      np.count_nonzero(LSV.isError),
+            'efficiency': (1 - np.count_nonzero(LSV.isError) / np.count_nonzero(LSV.isRequiredWork)) * 100
+            },
+        'B2B': {
+            'required':   np.count_nonzero(B2B.isRequiredWork),
+            'error':      np.count_nonzero(B2B.isError),
+            'efficiency': (1 - np.count_nonzero(B2B.isError) / np.count_nonzero(B2B.isRequiredWork)) * 100
+            },
+        'B2C': {
+            'required':   np.count_nonzero(B2B.isRequiredWork),
+            'error':      np.count_nonzero(B2C.isError),
+            'efficiency': (1 - np.count_nonzero(B2C.isError) / np.count_nonzero(B2C.isRequiredWork)) * 100
+            }
+    }
+
+    for department in results:
+        for bucket in settings[department]['BUDGET']['Success Rate to Bonus Pool']:
+            if bucket[0] >= results[department]['efficiency'] and results[department]['efficiency'] >= bucket[1]:
+                results[department]['bonus_percentage'] = bucket[2]
+                break
 
 
 
@@ -190,24 +204,19 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     with st.expander('**Dispatch Analysis**'):
         st.dataframe(dda, use_container_width=True, hide_index=True)
 
+
     with st.expander('**Efficiency**'):
-        st.write('**LSV**')
-        with st.container(border=True):
-            l, m, r = st.columns(3)
-            l.metric('Required Stops',           LSVrequired)
-            m.metric('Additional (Error) Stops', LSVerror)
-            r.metric('**Efficiency**',           round(LSVefficiency,3))
-        
-        st.write('**B2B**')
-        with st.container(border=True):
-            l, m, r = st.columns(3)
-            l.metric('Required Stops',           B2Brequired)
-            m.metric('Additional (Error) Stops', B2Berror)
-            r.metric('**Efficiency**',           round(B2Befficiency,3))
-        
-        st.write('**B2C**')
-        with st.container(border=True):
-            l, m, r = st.columns(3)
-            l.metric('Required Stops',           B2Crequired)
-            m.metric('Additional (Error) Stops', B2Cerror)
-            r.metric('**Efficiency**',           round(B2Cefficiency,3))
+
+        for department in results:
+            st.write(department)
+            with st.container(border=True):
+                l, m, r = st.columns(3)
+                l.metric('Required Stops',           results[department]['required'])
+                m.metric('Additional (Error) Stops', results[department]['error'])
+                r.metric('**Efficiency**',           round(results[department]['efficiency'],2))
+    
+    
+    with st.expander('**Bonus Percentage Due**'):
+
+        for department in results:
+            st.metric(department, results[department]['bonus_percentage'])
