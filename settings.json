@@ -3,12 +3,19 @@
     "BUDGET": {
       "Success Rate to Bonus Pool": [
         [
+          100,
           98,
-          100
+          1
         ],
         [
+          97.9,
           95,
-          50
+          0.5
+        ],
+        [
+          94.9,
+          0,
+          0
         ]
       ],
       "Max Bonus Pool Bucket": [
@@ -94,7 +101,7 @@
         [
           "Driver",
           "12",
-          0.40
+          0.4
         ]
       ]
     },
@@ -130,12 +137,19 @@
     "BUDGET": {
       "Success Rate to Bonus Pool": [
         [
+          100,
           98,
-          100
+          1
         ],
         [
+          97.9,
           95,
-          50
+          0.5
+        ],
+        [
+          94.9,
+          0,
+          0
         ]
       ],
       "Max Bonus Pool Bucket": [
@@ -240,12 +254,19 @@
     "BUDGET": {
       "Success Rate to Bonus Pool": [
         [
+          100,
           98,
-          100
+          1
         ],
         [
+          97.9,
           95,
-          50
+          0.5
+        ],
+        [
+          94.9,
+          0,
+          0
         ]
       ],
       "Max Bonus Pool Bucket": [
