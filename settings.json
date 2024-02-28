@@ -504,7 +504,7 @@
     },
     "DISPATCH": null
   },
-  "STORES": {
+  "STOREFRONT": {
     "BUDGET": {
       "Incentive Threshold": [0.97],
       "Disbursment Percentage": [0.03],
