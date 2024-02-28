@@ -280,6 +280,15 @@ if house_agreements is not None and dispatches is not None and prepayments is no
             df['Department'] = department
             summary.append(df)
     
+
+
+
+
+
+
+
+
+    
     final = pd.concat(summary)
     final = final.reset_index()
     final = final.rename(columns={'index': 'Role'})
