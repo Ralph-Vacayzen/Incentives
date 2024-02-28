@@ -5,6 +5,12 @@ import numpy as np
 
 
 
+
+
+
+
+
+
 st.set_page_config(page_title='Incentives', page_icon='💰', layout="wide", initial_sidebar_state="auto", menu_items=None)
 
 st.caption('VACAYZEN')
@@ -191,8 +197,27 @@ if house_agreements is not None and dispatches is not None and prepayments is no
             if bucket[0] >= results[department]['efficiency'] and results[department]['efficiency'] >= bucket[1]:
                 results[department]['bonus_percentage'] = bucket[2]
                 break
+    
+    for department in results:
+        max_bonus = 0
+        dates = pd.date_range(start, end)
+        
+        for day in dates:
+            
+            for bucket in settings[department]['BUDGET']['Max Bonus Pool Bucket']:
+                startDate = pd.to_datetime(bucket[0]).date()
+                endDate   = pd.to_datetime(bucket[1]).date()
+                days      = (endDate - startDate).days + 1
+                dailyRate = bucket[2] / days
 
+                if startDate <= day.date() and day.date() <= endDate:
+                    max_bonus += dailyRate
+                    break
+        
+        results[department]['max_bonus'] = round(max_bonus,2)
+        results[department]['calculated_bonus'] = results[department]['max_bonus'] * results[department]['bonus_percentage']
 
+        
 
 
 
@@ -206,7 +231,6 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
     with st.expander('**Efficiency**'):
-
         for department in results:
             st.write(department)
             with st.container(border=True):
@@ -216,7 +240,11 @@ if house_agreements is not None and dispatches is not None and prepayments is no
                 r.metric('**Efficiency**',           round(results[department]['efficiency'],2))
     
     
-    with st.expander('**Bonus Percentage Due**'):
-
+    with st.expander('**Bonus**'):
         for department in results:
-            st.metric(department, results[department]['bonus_percentage'])
+            st.write(department)
+            with st.container(border=True):
+                l, m, r = st.columns(3)
+                l.metric('Percentage of Max Bonus', results[department]['bonus_percentage'])
+                m.metric('Max Bonus', results[department]['max_bonus'])
+                r.metric('**Bonus**',           results[department]['calculated_bonus'])
