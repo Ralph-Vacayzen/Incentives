@@ -174,6 +174,15 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     B2B = dda[dda.isB2B]
     B2C = dda[dda.isB2C]
 
+
+
+
+
+
+
+
+
+
     results = {
         'LSV': {
             'required':   np.count_nonzero(LSV.isRequiredWork),
@@ -216,8 +225,17 @@ if house_agreements is not None and dispatches is not None and prepayments is no
         
         results[department]['max_bonus'] = round(max_bonus,2)
         results[department]['calculated_bonus'] = results[department]['max_bonus'] * results[department]['bonus_percentage']
+    
+    for department in results:
+        results[department]['disbursement'] = dict()
+        for role in settings[department]['STAFF']['Role to Number in Role to Disbursement']:
+            title   = role[0]
+            people  = role[1]
+            portion = role[2]
 
-        
+            results[department]['disbursement'][title] = [float(people), (results[department]['calculated_bonus'] * portion) / float(people)]
+
+
 
 
 
@@ -240,11 +258,32 @@ if house_agreements is not None and dispatches is not None and prepayments is no
                 r.metric('**Efficiency**',           round(results[department]['efficiency'],2))
     
     
-    with st.expander('**Bonus**'):
+    with st.expander('**Adjusted Bonus**'):
         for department in results:
             st.write(department)
             with st.container(border=True):
                 l, m, r = st.columns(3)
                 l.metric('Percentage of Max Bonus', results[department]['bonus_percentage'])
-                m.metric('Max Bonus', results[department]['max_bonus'])
-                r.metric('**Bonus**',           results[department]['calculated_bonus'])
+                m.metric('Max Bonus',               results[department]['max_bonus'])
+                r.metric('**Bonus Due**',           results[department]['calculated_bonus'])
+    
+    summary = []
+
+    with st.expander('**Disbursement**'):
+        for department in results:
+            st.write(department)
+
+            df = pd.DataFrame(results[department]['disbursement']).transpose()
+            df.columns = ['People','Bonus Due']
+            st.dataframe(df, use_container_width=True)
+
+            df['Department'] = department
+            summary.append(df)
+    
+    final = pd.concat(summary)
+    final = final.reset_index()
+    final = final.rename(columns={'index': 'Role'})
+    final = final[['Department','Role','People','Bonus Due']]
+    final = final[final['Bonus Due'] > 0]
+    
+    st.download_button('DOWNLOAD PAYROLL FILE', data=final.to_csv(index=False), file_name='Incentives_'+str(start)+'_'+str(end)+'.csv', mime='csv', type='primary', use_container_width=True)
