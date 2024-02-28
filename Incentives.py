@@ -57,7 +57,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     dp  = pd.read_csv(prepayments)
 
     def IsBS(row):
-        return (row.Product == 'Beach Services') or (row.DeliverOrPickupToType == 'BEACH SERVICE SET UP')
+        return (row.Product == 'Beach Services')    or (row.DeliverOrPickupToType in settings['BEACH']['DISPATCH']['SPECIFIC'])
     
     def IsLSV(row):
         return (row.Product == 'Golf Cart Rentals') or (row.DeliverOrPickupToType in settings['LSV']['DISPATCH']['SPECIFIC'])
@@ -195,7 +195,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
             'efficiency': (1 - np.count_nonzero(B2B.isError) / np.count_nonzero(B2B.isRequiredWork)) * 100
             },
         'B2C': {
-            'required':   np.count_nonzero(B2B.isRequiredWork),
+            'required':   np.count_nonzero(B2C.isRequiredWork),
             'error':      np.count_nonzero(B2C.isError),
             'efficiency': (1 - np.count_nonzero(B2C.isError) / np.count_nonzero(B2C.isRequiredWork)) * 100
             }
