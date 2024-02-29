@@ -183,31 +183,43 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
 
-    results = {
+    dispatch = {
         'LSV': {
-            'required':   np.count_nonzero(LSV.isRequiredWork),
-            'error':      np.count_nonzero(LSV.isError),
-            'efficiency': (1 - np.count_nonzero(LSV.isError) / np.count_nonzero(LSV.isRequiredWork)) * 100
+            'required':         np.count_nonzero(LSV.isRequiredWork),
+            'error':            np.count_nonzero(LSV.isError),
+            'efficiency':       (1 - np.count_nonzero(LSV.isError) / np.count_nonzero(LSV.isRequiredWork)) * 100,
+            'bonus_percentage': 0,
+            'max_bonus':        0,
+            'calculated_bonus': 0,
+            'disbursement':     {}
             },
         'B2B': {
-            'required':   np.count_nonzero(B2B.isRequiredWork),
-            'error':      np.count_nonzero(B2B.isError),
-            'efficiency': (1 - np.count_nonzero(B2B.isError) / np.count_nonzero(B2B.isRequiredWork)) * 100
+            'required':         np.count_nonzero(B2B.isRequiredWork),
+            'error':            np.count_nonzero(B2B.isError),
+            'efficiency':       (1 - np.count_nonzero(B2B.isError) / np.count_nonzero(B2B.isRequiredWork)) * 100,
+            'bonus_percentage': 0,
+            'max_bonus':        0,
+            'calculated_bonus': 0,
+            'disbursement':     {}
             },
         'B2C': {
-            'required':   np.count_nonzero(B2C.isRequiredWork),
-            'error':      np.count_nonzero(B2C.isError),
-            'efficiency': (1 - np.count_nonzero(B2C.isError) / np.count_nonzero(B2C.isRequiredWork)) * 100
+            'required':         np.count_nonzero(B2C.isRequiredWork),
+            'error':            np.count_nonzero(B2C.isError),
+            'efficiency':       (1 - np.count_nonzero(B2C.isError) / np.count_nonzero(B2C.isRequiredWork)) * 100,
+            'bonus_percentage': 0,
+            'max_bonus':        0,
+            'calculated_bonus': 0,
+            'disbursement':     {}
             }
     }
 
-    for department in results:
+    for department in dispatch:
         for bucket in settings[department]['BUDGET']['Success Rate to Bonus Pool']:
-            if bucket[0] >= results[department]['efficiency'] and results[department]['efficiency'] >= bucket[1]:
-                results[department]['bonus_percentage'] = bucket[2]
+            if bucket[0] >= dispatch[department]['efficiency'] and dispatch[department]['efficiency'] >= bucket[1]:
+                dispatch[department]['bonus_percentage'] = bucket[2]
                 break
     
-    for department in results:
+    for department in dispatch:
         max_bonus = 0
         dates = pd.date_range(start, end)
         
@@ -223,27 +235,17 @@ if house_agreements is not None and dispatches is not None and prepayments is no
                     max_bonus += dailyRate
                     break
         
-        results[department]['max_bonus'] = round(max_bonus,2)
-        results[department]['calculated_bonus'] = results[department]['max_bonus'] * results[department]['bonus_percentage']
+        dispatch[department]['max_bonus'] = round(max_bonus,2)
+        dispatch[department]['calculated_bonus'] = dispatch[department]['max_bonus'] * dispatch[department]['bonus_percentage']
     
-    for department in results:
-        results[department]['disbursement'] = dict()
+    for department in dispatch:
+        dispatch[department]['disbursement'] = dict()
         for role in settings[department]['STAFF']['Role to Number in Role to Disbursement']:
             title   = role[0]
             people  = role[1]
             portion = role[2]
 
-            results[department]['disbursement'][title] = [float(people), (results[department]['calculated_bonus'] * portion) / float(people)]
-
-
-
-
-
-
-
-
-
-    # dp     TODO       
+            dispatch[department]['disbursement'][title] = [float(people), (dispatch[department]['calculated_bonus'] * portion) / float(people)]
 
 
 
@@ -258,37 +260,91 @@ if house_agreements is not None and dispatches is not None and prepayments is no
         st.dataframe(dda, use_container_width=True, hide_index=True)
 
 
-    with st.expander('**Efficiency**'):
-        for department in results:
+    with st.expander('**Dispatch Efficiency**'):
+        for department in dispatch:
             st.write(department)
             with st.container(border=True):
                 l, m, r = st.columns(3)
-                l.metric('Required Stops',           results[department]['required'])
-                m.metric('Additional (Error) Stops', results[department]['error'])
-                r.metric('**Efficiency**',           round(results[department]['efficiency'],2))
+                l.metric('Required Stops',           dispatch[department]['required'])
+                m.metric('Additional (Error) Stops', dispatch[department]['error'])
+                r.metric('**Efficiency**',           round(dispatch[department]['efficiency'],2))
     
     
-    with st.expander('**Adjusted Bonus**'):
-        for department in results:
+    with st.expander('**Disptach Adjusted Bonus**'):
+        for department in dispatch:
             st.write(department)
             with st.container(border=True):
                 l, m, r = st.columns(3)
-                l.metric('Percentage of Max Bonus', results[department]['bonus_percentage'])
-                m.metric('Max Bonus',               results[department]['max_bonus'])
-                r.metric('**Bonus Due**',           results[department]['calculated_bonus'])
+                l.metric('Percentage of Max Bonus', dispatch[department]['bonus_percentage'])
+                m.metric('Max Bonus',               dispatch[department]['max_bonus'])
+                r.metric('**Bonus Due**',           dispatch[department]['calculated_bonus'])
     
     summary = []
 
-    with st.expander('**Disbursement**'):
-        for department in results:
+    with st.expander('**Disptach Disbursement**'):
+        for department in dispatch:
             st.write(department)
 
-            df = pd.DataFrame(results[department]['disbursement']).transpose()
+            df = pd.DataFrame(dispatch[department]['disbursement']).transpose()
             df.columns = ['People','Bonus Due']
             st.dataframe(df, use_container_width=True)
 
             df['Department'] = department
             summary.append(df)
+
+
+
+
+
+
+
+
+
+    dp['PaymentDate'] = pd.to_datetime(dp['PaymentDate']).dt.date
+    dp                = dp[(dp.PaymentDate >= start) & (dp.PaymentDate <= end)]
+
+
+
+
+
+
+
+
+
+    sales = {
+        'SALES': {
+            'transactions':   np.sum(dp.TransactionAmount),
+            'budgeted_sales': 0
+            },
+        'STOREFRONT': {
+            'transactions':   0,
+            'budgeted_sales': 0
+            }
+    }
+
+    for department in sales:
+        budgeted_sales = 0
+        dates = pd.date_range(start, end)
+        
+        for day in dates:
+            
+            for bucket in settings[department]['BUDGET']['Budgeted Sales']:
+                startDate = pd.to_datetime(bucket[0]).date()
+                endDate   = pd.to_datetime(bucket[1]).date()
+                days      = (endDate - startDate).days + 1
+                dailyRate = bucket[2] / days
+
+                if startDate <= day.date() and day.date() <= endDate:
+                    budgeted_sales += dailyRate
+                    break
+        
+        sales[department]['budgeted_sales']      = budgeted_sales
+        sales[department]['incentive_threshold'] = sales[department]['budgeted_sales']      * settings[department]['BUDGET']['Incentive Threshold'][0]
+        sales[department]['bucket']              = sales[department]['incentive_threshold'] - sales[department]['budgeted_sales']
+        sales[department]['calculated_bonus']    = sales[department]['bucket']              * settings[department]['BUDGET']['Disbursment Percentage'][0]
+
+    sales
+
     
 
 
