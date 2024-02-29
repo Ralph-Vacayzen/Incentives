@@ -343,7 +343,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
         sales[department]['bucket']              = sales[department]['incentive_threshold'] - sales[department]['budgeted_sales']
         sales[department]['calculated_bonus']    = sales[department]['bucket']              * settings[department]['BUDGET']['Disbursment Percentage'][0]
 
-    sales
+    # sales
 
     
 
