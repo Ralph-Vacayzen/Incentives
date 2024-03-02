@@ -256,11 +256,13 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
 
-    with st.expander('**Dispatch Analysis**'):
+    st.subheader('Dispatch')
+
+    with st.expander('**Analysis**'):
         st.dataframe(dda, use_container_width=True, hide_index=True)
 
 
-    with st.expander('**Dispatch Efficiency**'):
+    with st.expander('**Efficiency**'):
         for department in dispatch:
             st.write(department)
             with st.container(border=True):
@@ -270,7 +272,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
                 r.metric('**Efficiency**',           round(dispatch[department]['efficiency'],2))
     
     
-    with st.expander('**Disptach Adjusted Bonus**'):
+    with st.expander('**Adjusted Bonus**'):
         for department in dispatch:
             st.write(department)
             with st.container(border=True):
@@ -281,7 +283,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     
     summary = []
 
-    with st.expander('**Disptach Disbursement**'):
+    with st.expander('**Disbursement**'):
         for department in dispatch:
             st.write(department)
 
@@ -313,12 +315,20 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
     sales = {
         'SALES': {
-            'transactions':   np.sum(dp.TransactionAmount),
-            'budgeted_sales': 0
+            'transactions':        np.sum(dp.TransactionAmount),
+            'budgeted_sales':      0,
+            'incentive_threshold': 0,
+            'bucket':              0,
+            'calculated_bonus':    0,
+            'disbursement':        {}
             },
         'STOREFRONT': {
-            'transactions':   0,
-            'budgeted_sales': 0
+            'transactions':        0,
+            'budgeted_sales':      0,
+            'incentive_threshold': 0,
+            'bucket':              0,
+            'calculated_bonus':    0,
+            'disbursement':        {}
             }
     }
 
@@ -339,11 +349,33 @@ if house_agreements is not None and dispatches is not None and prepayments is no
                     break
         
         sales[department]['budgeted_sales']      = budgeted_sales
-        sales[department]['incentive_threshold'] = sales[department]['budgeted_sales']      * settings[department]['BUDGET']['Incentive Threshold'][0]
-        sales[department]['bucket']              = sales[department]['incentive_threshold'] - sales[department]['budgeted_sales']
-        sales[department]['calculated_bonus']    = sales[department]['bucket']              * settings[department]['BUDGET']['Disbursment Percentage'][0]
+        sales[department]['incentive_threshold'] = sales[department]['budgeted_sales'] * settings[department]['BUDGET']['Incentive Threshold'][0]
+        sales[department]['bucket']              = sales[department]['transactions']   - sales[department]['incentive_threshold']
+        if sales[department]['bucket'] <= 0:       sales[department]['bucket']         = 0
+        sales[department]['calculated_bonus']    = sales[department]['bucket']         * settings[department]['BUDGET']['Disbursment Percentage'][0]
+    
+    for department in sales:
+        sales[department]['disbursement'] = dict()
+        for role in settings[department]['STAFF']['Role to Number in Role to Disbursement']:
+            title   = role[0]
+            people  = role[1]
+            portion = role[2]
 
-    # sales
+            sales[department]['disbursement'][title] = [float(people), (sales[department]['calculated_bonus'] * portion) / float(people)]
+
+    
+
+
+
+
+
+
+
+
+    st.subheader('Sales')
+
+    with st.expander('**Analysis**'):
+        st.dataframe(dp, use_container_width=True, hide_index=True)
 
     
 
