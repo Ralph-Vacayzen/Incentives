@@ -3,14 +3,6 @@ import pandas as pd
 import numpy as np
 
 
-
-
-
-
-
-
-
-
 st.set_page_config(page_title='Incentives', page_icon='💰', layout="wide", initial_sidebar_state="auto", menu_items=None)
 
 st.caption('VACAYZEN')
@@ -24,7 +16,7 @@ end   = r.date_input('End of Period', min_value=start)
 
 settings = pd.read_json('settings.json')
 
-with st.expander('Files'):
+with st.expander('Uploaded Files'):
 
     dispatches = st.file_uploader(
         label='**Dispatch Activities**',
@@ -52,9 +44,19 @@ with st.expander('Files'):
 
 if house_agreements is not None and dispatches is not None and prepayments is not None:
 
-    dha = pd.read_csv(house_agreements)
-    dda = pd.read_csv(dispatches)
-    dp  = pd.read_csv(prepayments)
+    dha     = pd.read_csv(house_agreements)
+    dda     = pd.read_csv(dispatches)
+    dp      = pd.read_csv(prepayments)
+    summary = []
+
+
+
+
+
+
+
+
+
 
     def IsBS(row):
         return (row.Product == 'Beach Services')    or (row.DeliverOrPickupToType in settings['BEACH']['DISPATCH']['SPECIFIC'])
@@ -174,15 +176,6 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     B2B = dda[dda.isB2B]
     B2C = dda[dda.isB2C]
 
-
-
-
-
-
-
-
-
-
     dispatch = {
         'LSV': {
             'required':         np.count_nonzero(LSV.isRequiredWork),
@@ -245,54 +238,18 @@ if house_agreements is not None and dispatches is not None and prepayments is no
             people  = role[1]
             portion = role[2]
 
-            dispatch[department]['disbursement'][title] = [float(people), (dispatch[department]['calculated_bonus'] * portion) / float(people)]
+            dispatch[department]['disbursement'][title] = [
+                float(people),
+                (dispatch[department]['calculated_bonus'] * portion),
+                (dispatch[department]['calculated_bonus'] * portion) / float(people)
+                ]
+            
+    for department in dispatch:
+        df = pd.DataFrame(dispatch[department]['disbursement']).transpose()
+        df.columns = ['People','Bonus Due','Bonus Divided Equally']
+        df['Department'] = department
+        summary.append(df)
 
-
-
-
-
-
-
-
-
-
-    st.subheader('Dispatch')
-
-    with st.expander('**Analysis**'):
-        st.dataframe(dda, use_container_width=True, hide_index=True)
-
-
-    with st.expander('**Efficiency**'):
-        for department in dispatch:
-            st.write(department)
-            with st.container(border=True):
-                l, m, r = st.columns(3)
-                l.metric('Required Stops',           dispatch[department]['required'])
-                m.metric('Additional (Error) Stops', dispatch[department]['error'])
-                r.metric('**Efficiency**',           round(dispatch[department]['efficiency'],2))
-    
-    
-    with st.expander('**Adjusted Bonus**'):
-        for department in dispatch:
-            st.write(department)
-            with st.container(border=True):
-                l, m, r = st.columns(3)
-                l.metric('Percentage of Max Bonus', dispatch[department]['bonus_percentage'])
-                m.metric('Max Bonus',               dispatch[department]['max_bonus'])
-                r.metric('**Bonus Due**',           dispatch[department]['calculated_bonus'])
-    
-    summary = []
-
-    with st.expander('**Disbursement**'):
-        for department in dispatch:
-            st.write(department)
-
-            df = pd.DataFrame(dispatch[department]['disbursement']).transpose()
-            df.columns = ['People','Bonus Due']
-            st.dataframe(df, use_container_width=True)
-
-            df['Department'] = department
-            summary.append(df)
 
 
 
@@ -304,14 +261,6 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
     dp['PaymentDate'] = pd.to_datetime(dp['PaymentDate']).dt.date
     dp                = dp[(dp.PaymentDate >= start) & (dp.PaymentDate <= end)]
-
-
-
-
-
-
-
-
 
     sales = {
         'SALES': {
@@ -361,9 +310,17 @@ if house_agreements is not None and dispatches is not None and prepayments is no
             people  = role[1]
             portion = role[2]
 
-            sales[department]['disbursement'][title] = [float(people), (sales[department]['calculated_bonus'] * portion) / float(people)]
-
+            sales[department]['disbursement'][title] = [
+                float(people),
+                (sales[department]['calculated_bonus'] * portion),
+                (sales[department]['calculated_bonus'] * portion) / float(people)
+                ]
     
+    for department in sales:
+        df = pd.DataFrame(sales[department]['disbursement']).transpose()
+        df.columns = ['People','Bonus Due','Bonus Divided Equally']
+        df['Department'] = department
+        summary.append(df)
 
 
 
@@ -372,25 +329,92 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
 
-    st.subheader('Sales')
-
-    with st.expander('**Analysis**'):
-        st.dataframe(dp, use_container_width=True, hide_index=True)
-
-    
 
 
-
-
-
-
-
-
-    
     final = pd.concat(summary)
     final = final.reset_index()
     final = final.rename(columns={'index': 'Role'})
-    final = final[['Department','Role','People','Bonus Due']]
+    final = final[['Department','Role','People','Bonus Due','Bonus Divided Equally']]
     final = final[final['Bonus Due'] > 0]
     
     st.download_button('DOWNLOAD PAYROLL FILE', data=final.to_csv(index=False), file_name='Incentives_'+str(start)+'_'+str(end)+'.csv', mime='csv', type='primary', use_container_width=True)
+
+
+
+
+
+
+
+
+
+
+    with st.expander('**Dispatches**'):
+        st.dataframe(dda, use_container_width=True, hide_index=True)
+    
+
+
+
+
+    with st.expander('**Transactions**'):
+        st.dataframe(dp, use_container_width=True, hide_index=True)
+
+
+
+
+
+    with st.expander('**Efficiency**'):
+        for department in dispatch:
+            st.write(department)
+            with st.container(border=True):
+                l, m, r = st.columns(3)
+                l.metric('Required Stops',           dispatch[department]['required'])
+                m.metric('Additional (Error) Stops', dispatch[department]['error'])
+                r.metric('**Efficiency**',           round(dispatch[department]['efficiency'],2))
+        
+        for department in sales:
+            st.write(department)
+            with st.container(border=True):
+                l, m, r = st.columns(3)
+                l.metric('Budgeted Sales',      round(sales[department]['budgeted_sales'],2))
+                m.metric('Incentive Threshold', round(sales[department]['incentive_threshold'],2))
+                r.metric('Transations',         round(sales[department]['transactions'],2), round(sales[department]['transactions'] - sales[department]['incentive_threshold'],2))
+    
+    
+
+
+
+    with st.expander('**Adjusted Bonus**'):
+        for department in dispatch:
+            st.write(department)
+            with st.container(border=True):
+                l, m, r = st.columns(3)
+                l.metric('Percentage of Max Bonus', dispatch[department]['bonus_percentage'])
+                m.metric('Max Bonus',               dispatch[department]['max_bonus'])
+                r.metric('**Bonus Due**',           dispatch[department]['calculated_bonus'])
+        
+        for department in sales:
+            st.write(department)
+            with st.container(border=True):
+                l, m, r = st.columns(3)
+                l.metric('Bonus Bucket',           round(sales[department]['bucket'],2))
+                m.metric('Disbusement Percentage', settings[department]['BUDGET']['Disbursment Percentage'][0])
+                r.metric('**Bonus Due**',          round(sales[department]['calculated_bonus'],2))
+                
+
+
+
+
+    with st.expander('**Disbursement**'):
+        for department in dispatch:
+            st.write(department)
+
+            df = pd.DataFrame(dispatch[department]['disbursement']).transpose()
+            df.columns = ['People','Bonus Due','Bonus Divided Equally']
+            st.dataframe(df, use_container_width=True)
+
+        for department in sales:
+            st.write(department)
+
+            df = pd.DataFrame(sales[department]['disbursement']).transpose()
+            df.columns = ['People','Bonus Due','Bonus Divided Equally']
+            st.dataframe(df, use_container_width=True)
