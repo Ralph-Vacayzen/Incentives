@@ -31,7 +31,17 @@ with st.expander('Uploaded Files'):
     house_agreements = st.file_uploader(
         label='**House Program Order Numbers**',
         type='CSV',
-        help='These order numbers will be the only orders considered in terms of activity in this analysis.')
+        help='These are from a Partner Program Register report, House Agreements - All - B2B.')
+    
+    beach_orders = st.file_uploader(
+        label='**Beach Service Orders**',
+        type='CSV',
+        help='These are from the integraRental database report, Incentives_Beach.')
+    
+    beach_seasonals = st.file_uploader(
+        label='**Beach Service Seasonals**',
+        type='CSV',
+        help='These are from the Google Sheet, Beach Service Seasonals.')
 
 
 
@@ -42,11 +52,13 @@ with st.expander('Uploaded Files'):
 
 
 
-if house_agreements is not None and dispatches is not None and prepayments is not None:
+if house_agreements is not None and dispatches is not None and prepayments is not None and beach_orders is not None and beach_seasonals is not None:
 
     dha     = pd.read_csv(house_agreements)
     dda     = pd.read_csv(dispatches)
     dp      = pd.read_csv(prepayments)
+    bso     = pd.read_csv(beach_orders)
+    bss     = pd.read_csv(beach_seasonals)
     summary = []
 
 
