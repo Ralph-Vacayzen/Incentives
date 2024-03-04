@@ -169,6 +169,8 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
 
+    # SECTION: LSV, B2B, B2C
+    
     dda['Dispatch']         = pd.to_datetime(dda['Dispatch']).dt.date
     dda                     = dda[(dda.Dispatch >= start) & (dda.Dispatch <= end)]
     dda['isBS']             = dda.apply(IsBS,      axis=1)
@@ -271,6 +273,25 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
 
+    # SECTION: BEACH
+        
+    bso['RentalAgreementStartDate'] = pd.to_datetime(bso['RentalAgreementStartDate']).dt.date
+    bso['RentalAgreementEndDate']   = pd.to_datetime(bso['RentalAgreementEndDate']).dt.date
+    # bso['ProductDescription']       = str(bso['ProductDescription']).upper()
+
+    bso
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    # SECTION: SALES, STOREFRONT
+    
     dp['PaymentDate'] = pd.to_datetime(dp['PaymentDate']).dt.date
     dp                = dp[(dp.PaymentDate >= start) & (dp.PaymentDate <= end)]
 
