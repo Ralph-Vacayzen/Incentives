@@ -70,6 +70,8 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
 
+    # LOGIC: LSV, B2B, B2C
+
     def IsBS(row):
         return (row.Product == 'Beach Services')    or (row.DeliverOrPickupToType in settings['BEACH']['DISPATCH']['SPECIFIC'])
     
@@ -160,6 +162,32 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
         return False
     
+    # LOGIC: BEACH
+
+    def IsSpecificBS(row):
+        return row.ProductDescription in settings['BEACH']['DISPATCH']['SPECIFIC']
+    
+    def IsInRange(row):
+        dates = pd.date_range(start, end)
+    
+        for day in dates:
+            if row.RentalAgreementStartDate <= day.date() and day.date() <= row.RentalAgreementEndDate:
+                return True
+        
+        return False
+    
+    def AdjustStartDate(row):
+        if row.RentalAgreementStartDate < start:
+            return start
+        return row.RentalAgreementStartDate
+    
+    def AdjustEndDate(row):
+        if row.RentalAgreementEndDate > end:
+            return end
+        return row.RentalAgreementEndDate
+    
+    def GetSetupDays(row):
+        return len(pd.date_range(row.RentalAgreementStartDate, row.RentalAgreementEndDate))
 
 
 
@@ -186,9 +214,26 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     dda['isAdditionalWork'] = dda.apply(IsAdditionalWork, axis=1)
     dda['isError']          = dda.apply(IsError,          axis=1)
 
+    dda                     = dda.drop(columns=['isBS'])
+
     LSV = dda[dda.isLSV]
     B2B = dda[dda.isB2B]
     B2C = dda[dda.isB2C]
+
+    # SECTION: BEACH
+
+    bso['RentalAgreementStartDate'] = pd.to_datetime(bso['RentalAgreementStartDate']).dt.date
+    bso['RentalAgreementEndDate']   = pd.to_datetime(bso['RentalAgreementEndDate']).dt.date
+    bso['isSpecific']               = bso.apply(IsSpecificBS, axis=1)
+    bso                             = bso[bso.isSpecific]
+    bso['isInRange']                = bso.apply(IsInRange, axis=1)
+    bso                             = bso[bso.isInRange]
+    bso['RentalAgreementStartDate'] = bso.apply(AdjustStartDate, axis=1)
+    bso['RentalAgreementEndDate']   = bso.apply(AdjustEndDate, axis=1)
+    bso['SetupDays']                = bso.apply(GetSetupDays, axis=1)
+
+    bss['DATE']                     = pd.to_datetime(bss['DATE']).dt.date
+    bss                             = bss[(start <= bss['DATE']) & (bss['DATE'] <= end)]
 
     dispatch = {
         'LSV': {
@@ -217,7 +262,16 @@ if house_agreements is not None and dispatches is not None and prepayments is no
             'max_bonus':        0,
             'calculated_bonus': 0,
             'disbursement':     {}
-            }
+            },
+        'BEACH': {                                                                  # TODO
+            'required':         np.sum(bso.SetupDays) + bss.shape[0],
+            'error':            0,
+            'efficiency':       (1 - 0) / np.sum(bso.SetupDays) + bss.shape[0],
+            'bonus_percentage': 0,
+            'max_bonus':        0,
+            'calculated_bonus': 0,
+            'disbursement':     {}
+        }
     }
 
     for department in dispatch:
@@ -264,22 +318,6 @@ if house_agreements is not None and dispatches is not None and prepayments is no
         df['Department'] = department
         summary.append(df)
 
-
-
-
-
-
-
-
-
-
-    # SECTION: BEACH
-        
-    bso['RentalAgreementStartDate'] = pd.to_datetime(bso['RentalAgreementStartDate']).dt.date
-    bso['RentalAgreementEndDate']   = pd.to_datetime(bso['RentalAgreementEndDate']).dt.date
-    # bso['ProductDescription']       = str(bso['ProductDescription']).upper()
-
-    bso
     
     
     
@@ -287,8 +325,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     
     
     
-    
-    
+
 
     # SECTION: SALES, STOREFRONT
     
