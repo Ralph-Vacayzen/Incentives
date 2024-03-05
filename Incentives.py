@@ -341,7 +341,15 @@ if house_agreements is not None and dispatches is not None and prepayments is no
             'calculated_bonus':    0,
             'disbursement':        {}
             },
-        'STOREFRONT': {
+        'BAY BAITS': {
+            'transactions':        0,
+            'budgeted_sales':      0,
+            'incentive_threshold': 0,
+            'bucket':              0,
+            'calculated_bonus':    0,
+            'disbursement':        {}
+            },
+        'SEAGROVE': {
             'transactions':        0,
             'budgeted_sales':      0,
             'incentive_threshold': 0,
@@ -419,7 +427,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
     with st.expander('**Dispatches**'):
-        st.dataframe(dda, use_container_width=True, hide_index=True)
+        st.data_editor(dda, use_container_width=True, hide_index=True)
     
 
 
