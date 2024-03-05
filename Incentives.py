@@ -266,7 +266,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
         'BEACH': {                                                                  # TODO
             'required':         np.sum(bso.SetupDays) + bss.shape[0],
             'error':            0,
-            'efficiency':       (1 - 0) / np.sum(bso.SetupDays) + bss.shape[0],
+            'efficiency':       (1 - 0 / (np.sum(bso.SetupDays) + bss.shape[0])) * 100,
             'bonus_percentage': 0,
             'max_bonus':        0,
             'calculated_bonus': 0,
@@ -427,7 +427,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
     with st.expander('**Dispatches**'):
-        st.data_editor(dda, use_container_width=True, hide_index=True)
+        dda = st.data_editor(dda, use_container_width=True, hide_index=True)
     
 
 
