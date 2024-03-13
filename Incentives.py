@@ -165,7 +165,10 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     # LOGIC: BEACH
 
     def IsSpecificBS(row):
-        return row.ProductDescription in settings['BEACH']['DISPATCH']['SPECIFIC']
+        isSpecificProduct = row.ProductDescription in settings['BEACH']['DISPATCH']['SPECIFIC']
+        isSpecificService = row.ShortDescription   in settings['BEACH']['DISPATCH']['SPECIFIC']
+
+        return isSpecificProduct or isSpecificService
     
     def IsInRange(row):
         dates = pd.date_range(start, end)
@@ -188,7 +191,9 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     
     def GetSetupDays(row):
         return len(pd.date_range(row.RentalAgreementStartDate, row.RentalAgreementEndDate))
-
+    
+    def IsBeachError(row):
+        return row.ShortDescription == 'Beach Fix'
 
 
 
@@ -231,9 +236,15 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     bso['RentalAgreementStartDate'] = bso.apply(AdjustStartDate, axis=1)
     bso['RentalAgreementEndDate']   = bso.apply(AdjustEndDate, axis=1)
     bso['SetupDays']                = bso.apply(GetSetupDays, axis=1)
+    bso['isError']                  = bso.apply(IsBeachError, axis=1)
 
     bss['DATE']                     = pd.to_datetime(bss['DATE']).dt.date
     bss                             = bss[(start <= bss['DATE']) & (bss['DATE'] <= end)]
+
+
+    with st.expander('**Dispatches**'):
+        st.dataframe(dda, use_container_width=True, hide_index=True)
+
 
     dispatch = {
         'LSV': {
@@ -265,8 +276,8 @@ if house_agreements is not None and dispatches is not None and prepayments is no
             },
         'BEACH': {                                                                  # TODO
             'required':         np.sum(bso.SetupDays) + bss.shape[0],
-            'error':            0,
-            'efficiency':       (1 - 0 / (np.sum(bso.SetupDays) + bss.shape[0])) * 100,
+            'error':            np.count_nonzero(bso.isError),
+            'efficiency':       (1 - np.count_nonzero(bso.isError) / (np.sum(bso.SetupDays) + bss.shape[0])) * 100,
             'bonus_percentage': 0,
             'max_bonus':        0,
             'calculated_bonus': 0,
@@ -409,13 +420,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
 
-    final = pd.concat(summary)
-    final = final.reset_index()
-    final = final.rename(columns={'index': 'Role'})
-    final = final[['Department','Role','People','Bonus Due','Bonus Divided Equally']]
-    final = final[final['Bonus Due'] > 0]
     
-    st.download_button('DOWNLOAD PAYROLL FILE', data=final.to_csv(index=False), file_name='Incentives_'+str(start)+'_'+str(end)+'.csv', mime='csv', type='primary', use_container_width=True)
 
 
 
@@ -427,7 +432,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
     with st.expander('**Dispatches**'):
-        dda = st.data_editor(dda, use_container_width=True, hide_index=True)
+        st.dataframe(dda, use_container_width=True, hide_index=True)
     
 
 
@@ -435,6 +440,10 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
     with st.expander('**Transactions**'):
         st.dataframe(dp, use_container_width=True, hide_index=True)
+
+
+    
+
 
 
 
@@ -496,3 +505,20 @@ if house_agreements is not None and dispatches is not None and prepayments is no
             df = pd.DataFrame(sales[department]['disbursement']).transpose()
             df.columns = ['People','Bonus Due','Bonus Divided Equally']
             st.dataframe(df, use_container_width=True)
+    
+
+
+
+
+
+
+
+
+
+    final = pd.concat(summary)
+    final = final.reset_index()
+    final = final.rename(columns={'index': 'Role'})
+    final = final[['Department','Role','People','Bonus Due','Bonus Divided Equally']]
+    final = final[final['Bonus Due'] > 0]
+    
+    st.download_button('DOWNLOAD PAYROLL FILE', data=final.to_csv(index=False), file_name='Incentives_'+str(start)+'_'+str(end)+'.csv', mime='csv', type='primary', use_container_width=True)
