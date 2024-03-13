@@ -221,9 +221,9 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
     dda                     = dda.drop(columns=['isBS'])
 
-    LSV = dda[dda.isLSV]
-    B2B = dda[dda.isB2B]
-    B2C = dda[dda.isB2C]
+    LSV = dda[dda.isLSV].drop(columns=['isLSV','isB2B','isB2C','isIgnored']).sort_values(by='isError',ascending=False)
+    B2B = dda[dda.isB2B].drop(columns=['isLSV','isB2B','isB2C','isIgnored']).sort_values(by='isError',ascending=False)
+    B2C = dda[dda.isB2C].drop(columns=['isLSV','isB2B','isB2C','isIgnored']).sort_values(by='isError',ascending=False)
 
     # SECTION: BEACH
 
@@ -243,7 +243,18 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
     with st.expander('**Dispatches**'):
-        st.dataframe(dda, use_container_width=True, hide_index=True)
+
+        'LSV'
+        LSV = st.data_editor(LSV, use_container_width=True, hide_index=True)
+
+        'B2B'
+        B2B = st.data_editor(B2B, use_container_width=True, hide_index=True)
+
+        'B2C'
+        B2C = st.data_editor(B2C, use_container_width=True, hide_index=True)
+
+        'BEACH'
+        bso = st.data_editor(bso, use_container_width=True, hide_index=True)
 
 
     dispatch = {
@@ -416,23 +427,6 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
 
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-    with st.expander('**Dispatches**'):
-        st.dataframe(dda, use_container_width=True, hide_index=True)
     
 
 
@@ -441,11 +435,7 @@ if house_agreements is not None and dispatches is not None and prepayments is no
     with st.expander('**Transactions**'):
         st.dataframe(dp, use_container_width=True, hide_index=True)
 
-
     
-
-
-
 
 
 
