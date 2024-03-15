@@ -221,9 +221,9 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
     dda                     = dda.drop(columns=['isBS'])
 
-    LSV = dda[dda.isLSV].drop(columns=['isLSV','isB2B','isB2C','isIgnored']).sort_values(by='isError',ascending=False)
-    B2B = dda[dda.isB2B].drop(columns=['isLSV','isB2B','isB2C','isIgnored']).sort_values(by='isError',ascending=False)
-    B2C = dda[dda.isB2C].drop(columns=['isLSV','isB2B','isB2C','isIgnored']).sort_values(by='isError',ascending=False)
+    LSV = dda[dda.isLSV].drop(columns=['isLSV','isB2B','isB2C','isIgnored']).sort_values(by=['isError','Dispatch','RentalAgreementID'],ascending=False)
+    B2B = dda[dda.isB2B].drop(columns=['isLSV','isB2B','isB2C','isIgnored']).sort_values(by=['isError','Dispatch','RentalAgreementID'],ascending=False)
+    B2C = dda[dda.isB2C].drop(columns=['isLSV','isB2B','isB2C','isIgnored']).sort_values(by=['isError','Dispatch','RentalAgreementID'],ascending=False)
 
     # SECTION: BEACH
 
@@ -505,6 +505,13 @@ if house_agreements is not None and dispatches is not None and prepayments is no
 
 
 
+    # with pd.ExcelWriter('Errors_'+str(start)+'_'+str(end)+'.csv', engine='xlsxwriter') as file:
+    #     LSV[LSV['isError']].to_excel(file, sheet_name='LSV',   index=False)
+    #     B2B[B2B['isError']].to_excel(file, sheet_name='B2B',   index=False)
+    #     B2C[B2C['isError']].to_excel(file, sheet_name='B2C',   index=False)
+    #     bso[bso['isError']].to_excel(file, sheet_name='BEACH', index=False)
+    
+    
     final = pd.concat(summary)
     final = final.reset_index()
     final = final.rename(columns={'index': 'Role'})
