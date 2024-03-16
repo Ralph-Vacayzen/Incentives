@@ -42,7 +42,7 @@ with st.expander('Uploaded Files'):
     )
 
     st.info('File names are **case sensitive** and **must be identical** to the file name below.')
-    st.dataframe(pd.DataFrame(file_descriptions, columns=['Required Files','Source Location']), hide_index=True, use_container_width=True)
+    st.dataframe(pd.DataFrame(file_descriptions, columns=['Required File','Source Location']), hide_index=True, use_container_width=True)
 
 
 
