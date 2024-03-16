@@ -44,17 +44,25 @@ with st.expander('Uploaded Files'):
     st.dataframe(pd.DataFrame(file_descriptions, columns=['Required Files','Source Location']), hide_index=True, use_container_width=True)
 
 
-    if len(uploaded_files) > 0:
-        for index, file in enumerate(uploaded_files):
-            files[file.name] = index
-    
-        hasAllRequiredFiles = True
-        missing = []
 
-        for file in files:
-            if files[file] == None:
-                hasAllRequiredFiles = False
-                missing.append(file)
+
+
+
+
+
+
+
+if len(uploaded_files) > 0:
+    for index, file in enumerate(uploaded_files):
+        files[file.name] = index
+
+    hasAllRequiredFiles = True
+    missing = []
+
+    for file in files:
+        if files[file] == None:
+            hasAllRequiredFiles = False
+            missing.append(file)
 
 if len(uploaded_files) > 0 and not hasAllRequiredFiles:
     for item in missing:
@@ -521,6 +529,14 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     
     # st.download_button('DOWNLOAD ERRORS FILE', data='Errors_'+str(start)+'_'+str(end)+'.xlsx', file_name='Errors_'+str(start)+'_'+str(end)+'.xlsx', mime='xlsx', type='primary', use_container_width=True)
     
+    
+
+
+
+
+
+
+
     
     final = pd.concat(summary)
     final = final.reset_index()
