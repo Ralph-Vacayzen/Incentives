@@ -521,13 +521,13 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
 
 
 
-    # with pd.ExcelWriter('Errors_'+str(start)+'_'+str(end)+'.xlsx', ) as errors:
-    #     LSV[LSV['isError']].to_excel(errors, sheet_name='LSV',   index=False)
-    #     B2B[B2B['isError']].to_excel(errors, sheet_name='B2B',   index=False)
-    #     B2C[B2C['isError']].to_excel(errors, sheet_name='B2C',   index=False)
-    #     bso[bso['isError']].to_excel(errors, sheet_name='BEACH', index=False)
-    
-    # st.download_button('DOWNLOAD ERRORS FILE', data='Errors_'+str(start)+'_'+str(end)+'.xlsx', file_name='Errors_'+str(start)+'_'+str(end)+'.xlsx', mime='xlsx', type='primary', use_container_width=True)
+    with pd.ExcelWriter('errors.xlsx') as errors:
+        LSV[LSV['isError']].to_excel(errors, sheet_name='LSV',   index=False)
+        B2B[B2B['isError']].to_excel(errors, sheet_name='B2B',   index=False)
+        B2C[B2C['isError']].to_excel(errors, sheet_name='B2C',   index=False)
+        bso[bso['isError']].to_excel(errors, sheet_name='BEACH', index=False)
+
+    st.download_button('DOWNLOAD ERRORS FILE', data='errors.xlsx', file_name='Errors_'+str(start)+'_'+str(end)+'.xls', type='secondary', use_container_width=True)
     
     
 
