@@ -18,12 +18,6 @@ settings = pd.read_json('settings.json')
 
 with st.expander('Uploaded Files'):
     
-    uploaded_files = st.file_uploader(
-        label='Files',
-        type='CSV',
-        accept_multiple_files=True
-    )
-
     file_descriptions = [
         ['Incentive_Dispatches.csv','An integraRental database report, Incentive_Dispatches.'],
         ['Incentive_Payments.csv','An integraRental database report, Incentive_Payments.'],
@@ -31,9 +25,6 @@ with st.expander('Uploaded Files'):
         ['Incentive_Beach_Seasonals.csv','A tab from a Google Sheet, Beach Service Seasonals.'],
         ['House_Agreements.csv','A Partner Program Register (PPR) report, House Agreements - All - B2B.']
     ]
-
-    st.dataframe(pd.DataFrame(file_descriptions, columns=['Required Files','Source Location']), hide_index=True, use_container_width=True)
-    st.info('File names are case sensitive and must be identical to the file name above.')
 
     files = {
         'Incentive_Dispatches.csv': None,
@@ -44,21 +35,33 @@ with st.expander('Uploaded Files'):
     }
 
 
-    if len(uploaded_files) == 5:
+    uploaded_files = st.file_uploader(
+        label='Files (' + str(len(files)) + ')',
+        accept_multiple_files=True
+    )
+
+    st.info('File names are **case sensitive** and **must be identical** to the file name above.')
+    st.dataframe(pd.DataFrame(file_descriptions, columns=['Required Files','Source Location']), hide_index=True, use_container_width=True)
+
+
+    if len(uploaded_files) > 0:
         for index, file in enumerate(uploaded_files):
             files[file.name] = index
     
-    isAllFilesPresent = True
-    missing = []
+        hasAllRequiredFiles = True
+        missing = []
 
-    for file in files:
-        if files[file] == None:
-            isAllFilesPresent = False
+        for file in files:
+            if files[file] == None:
+                hasAllRequiredFiles = False
+                missing.append(file)
 
-if len(uploaded_files) > 0 and not isAllFilesPresent:
-    st.warning('A required file is not provided.')
+if len(uploaded_files) > 0 and not hasAllRequiredFiles:
+    for item in missing:
+        st.warning('**' + item + '** is missing and required.')
 
-elif len(uploaded_files) > 0 and isAllFilesPresent:
+
+elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     dha     = pd.read_csv(uploaded_files[files['House_Agreements.csv']])
     dda     = pd.read_csv(uploaded_files[files['Incentive_Dispatches.csv']])
     dp      = pd.read_csv(uploaded_files[files['Incentive_Payments.csv']])
