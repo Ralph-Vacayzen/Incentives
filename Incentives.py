@@ -40,7 +40,7 @@ with st.expander('Uploaded Files'):
         accept_multiple_files=True
     )
 
-    st.info('File names are **case sensitive** and **must be identical** to the file name above.')
+    st.info('File names are **case sensitive** and **must be identical** to the file name below.')
     st.dataframe(pd.DataFrame(file_descriptions, columns=['Required Files','Source Location']), hide_index=True, use_container_width=True)
 
 
@@ -537,7 +537,7 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
 
 
 
-    
+
     final = pd.concat(summary)
     final = final.reset_index()
     final = final.rename(columns={'index': 'Role'})
