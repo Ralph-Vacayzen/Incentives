@@ -17,48 +17,53 @@ end   = r.date_input('End of Period', min_value=start)
 settings = pd.read_json('settings.json')
 
 with st.expander('Uploaded Files'):
-
-    dispatches = st.file_uploader(
-        label='**Dispatch Activities**',
-        type='CSV',
-        help='These are from the integraRental database report, Incentives_Dispatches.')
-
-    prepayments = st.file_uploader(
-        label='**Prepayments**',
-        type='CSV',
-        help='These are from the integraRental database report, Incentives_Prepayments.')
     
-    house_agreements = st.file_uploader(
-        label='**House Program Order Numbers**',
+    uploaded_files = st.file_uploader(
+        label='Files',
         type='CSV',
-        help='These are from a Partner Program Register report, House Agreements - All - B2B.')
+        accept_multiple_files=True
+    )
+
+    file_descriptions = [
+        ['Incentive_Dispatches.csv','An integraRental database report, Incentive_Dispatches.'],
+        ['Incentive_Payments.csv','An integraRental database report, Incentive_Payments.'],
+        ['Incentive_Beach.csv','An integraRental database report, Incentive_Beach.'],
+        ['Incentive_Beach_Seasonals.csv','A tab from a Google Sheet, Beach Service Seasonals.'],
+        ['House_Agreements.csv','A Partner Program Register (PPR) report, House Agreements - All - B2B.']
+    ]
+
+    st.dataframe(pd.DataFrame(file_descriptions, columns=['Required Files','Source Location']), hide_index=True, use_container_width=True)
+    st.info('File names are case sensitive and must be identical to the file name above.')
+
+    files = {
+        'Incentive_Dispatches.csv': None,
+        'Incentive_Payments.csv': None,
+        'House_Agreements.csv': None,
+        'Incentive_Beach.csv': None,
+        'Incentive_Beach_Seasonals.csv': None
+    }
+
+
+    if len(uploaded_files) == 5:
+        for index, file in enumerate(uploaded_files):
+            files[file.name] = index
     
-    beach_orders = st.file_uploader(
-        label='**Beach Service Orders**',
-        type='CSV',
-        help='These are from the integraRental database report, Incentives_Beach.')
-    
-    beach_seasonals = st.file_uploader(
-        label='**Beach Service Seasonals**',
-        type='CSV',
-        help='These are from the Google Sheet, Beach Service Seasonals.')
+    isAllFilesPresent = True
+    missing = []
 
+    for file in files:
+        if files[file] == None:
+            isAllFilesPresent = False
 
+if len(uploaded_files) > 0 and not isAllFilesPresent:
+    st.warning('A required file is not provided.')
 
-
-
-
-
-
-
-
-if house_agreements is not None and dispatches is not None and prepayments is not None and beach_orders is not None and beach_seasonals is not None:
-
-    dha     = pd.read_csv(house_agreements)
-    dda     = pd.read_csv(dispatches)
-    dp      = pd.read_csv(prepayments)
-    bso     = pd.read_csv(beach_orders)
-    bss     = pd.read_csv(beach_seasonals)
+elif len(uploaded_files) > 0 and isAllFilesPresent:
+    dha     = pd.read_csv(uploaded_files[files['House_Agreements.csv']])
+    dda     = pd.read_csv(uploaded_files[files['Incentive_Dispatches.csv']])
+    dp      = pd.read_csv(uploaded_files[files['Incentive_Payments.csv']])
+    bso     = pd.read_csv(uploaded_files[files['Incentive_Beach.csv']])
+    bss     = pd.read_csv(uploaded_files[files['Incentive_Beach_Seasonals.csv']])
     summary = []
 
 
