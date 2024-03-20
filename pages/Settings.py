@@ -14,10 +14,24 @@ if not logged_in:
     def Create_Stream(phrase):
         for word in phrase.split(' '):
             yield word + ' '
-            time.sleep(0.02)
+            time.sleep(0.03)
 
-    with st.chat_message('assistant'):
-        st.write_stream(Create_Stream('Be sure to save any changes after each adjustment, and **double-check the save went through.**'))
+    messages = st.container(border=True)
+    messages.chat_message('assistant').write_stream(Create_Stream('Good day! I am the **Pass Ward**. Please provide the phrase to pass through this security check.'))
+
+    if prompt := st.chat_input():
+        messages.chat_message('user').write_stream(Create_Stream(prompt))
+
+        if prompt == st.secrets['SETTINGS_PASSWORD']:
+            logged_in == True
+        else:
+            messages.chat_message('assistant').write_stream(Create_Stream('That did not seem to match my records. Are you sure you should be here? Please try another passphrase.'))
+
+
+
+
+        
+        
 
 
 if logged_in:
