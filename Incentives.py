@@ -556,9 +556,10 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
             df = df[df['Bonus Due'] > 0]
 
             if len(df) > 0:
-                df.to_csv(f'{df['Department'][0]}.csv', index=False)
-                izip.write(f'{df['Department'][0]}.csv')
-                os.remove(f'{df['Department'][0]}.csv')
+                file_name = df['Department'][0]
+                df.to_csv(f'{file_name}.csv', index=False)
+                izip.write(f'{file_name}.csv')
+                os.remove(f'{file_name}.csv')
     
     with open('incentives.zip','rb') as error_file:
         st.download_button('DOWNLOAD PAYROLL FILE', data=error_file, file_name='Incentives_'+str(start)+'_'+str(end)+'.zip', type='primary', use_container_width=True)
