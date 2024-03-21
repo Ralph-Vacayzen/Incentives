@@ -24,13 +24,13 @@ with st.expander('Uploaded Files'):
         ['Incentive_Payments.csv','An integraRental database report, Incentive_Payments.'],
         ['Incentive_Beach.csv','An integraRental database report, Incentive_Beach.'],
         ['Incentive_Beach_Seasonals.csv','A tab from a Google Sheet, Beach Service Seasonals.'],
-        ['House_Agreements.csv','A Partner Program Register (PPR) report, House Agreements - All - B2B.']
+        ['Incentive_House_Agreements.csv','A Partner Program Register (PPR) report, House Agreements - All - B2B.']
     ]
 
     files = {
         'Incentive_Dispatches.csv': None,
         'Incentive_Payments.csv': None,
-        'House_Agreements.csv': None,
+        'Incentive_House_Agreements.csv': None,
         'Incentive_Beach.csv': None,
         'Incentive_Beach_Seasonals.csv': None
     }
@@ -71,7 +71,7 @@ if len(uploaded_files) > 0 and not hasAllRequiredFiles:
 
 
 elif len(uploaded_files) > 0 and hasAllRequiredFiles:
-    dha     = pd.read_csv(uploaded_files[files['House_Agreements.csv']])
+    dha     = pd.read_csv(uploaded_files[files['Incentive_House_Agreements.csv']])
     dda     = pd.read_csv(uploaded_files[files['Incentive_Dispatches.csv']])
     dp      = pd.read_csv(uploaded_files[files['Incentive_Payments.csv']])
     bso     = pd.read_csv(uploaded_files[files['Incentive_Beach.csv']])
