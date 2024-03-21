@@ -531,12 +531,11 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
         [bso[bso['isError']],'BEACH']
     ]
 
-    with zipfile.ZipFile('errors.zip', 'w') as zip:
+    with zipfile.ZipFile('errors.zip', 'w') as ezip:
         for error in errors:
             error[0].to_csv(f'{error[1]}.csv', index=False)
-            zip.write(f'{error[1]}.csv')
+            ezip.write(f'{error[1]}.csv')
             os.remove(f'{error[1]}.csv')
-    
     
     with open('errors.zip','rb') as error_file:
         st.download_button('DOWNLOAD ERRORS FILE', data=error_file, file_name='Errors_'+str(start)+'_'+str(end)+'.zip', type='secondary', use_container_width=True)
@@ -547,10 +546,44 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
 
 
 
-    final = pd.concat(summary)
-    final = final.reset_index()
-    final = final.rename(columns={'index': 'Role'})
-    final = final[['Department','Role','People','Bonus Due','Bonus Divided Equally']]
-    final = final[final['Bonus Due'] > 0]
+
+
+    with zipfile.ZipFile('incentives.zip', 'w') as izip:
+        for department in summary:
+            df = department.reset_index()
+            df = df.rename(columns={'index': 'Role'})
+            df = df[['Department','Role','People','Bonus Due','Bonus Divided Equally']]
+            df = df[df['Bonus Due'] > 0]
+
+            if len(df) > 0:
+                df.to_csv(f'{df['Department'][0]}.csv', index=False)
+                izip.write(f'{df['Department'][0]}.csv')
+                os.remove(f'{df['Department'][0]}.csv')
     
-    st.download_button('DOWNLOAD PAYROLL FILE', data=final.to_csv(index=False), file_name='Incentives_'+str(start)+'_'+str(end)+'.csv', mime='csv', type='primary', use_container_width=True)
+    with open('incentives.zip','rb') as error_file:
+        st.download_button('DOWNLOAD PAYROLL FILE', data=error_file, file_name='Incentives_'+str(start)+'_'+str(end)+'.zip', type='primary', use_container_width=True)
+    
+
+    # final = pd.concat(summary)
+    # final = final.reset_index()
+    # final = final.rename(columns={'index': 'Role'})
+    # final = final[['Department','Role','People','Bonus Due','Bonus Divided Equally']]
+    # final = final[final['Bonus Due'] > 0]
+    
+    # st.download_button('DOWNLOAD PAYROLL FILE', data=final.to_csv(index=False), file_name='Incentives_'+str(start)+'_'+str(end)+'.csv', mime='csv', type='primary', use_container_width=True)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # final = pd.concat(summary)
+    # final = final.reset_index()
+    # final = final.rename(columns={'index': 'Role'})
+    # final = final[['Department','Role','People','Bonus Due','Bonus Divided Equally']]
+    # final = final[final['Bonus Due'] > 0]
+    
+    # st.download_button('DOWNLOAD PAYROLL FILE', data=final.to_csv(index=False), file_name='Incentives_'+str(start)+'_'+str(end)+'.csv', mime='csv', type='primary', use_container_width=True)
