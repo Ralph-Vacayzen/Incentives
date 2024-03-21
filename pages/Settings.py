@@ -22,7 +22,6 @@ if not logged_in:
 if logged_in:
     st.info('Be sure to save any changes after each adjustment, and **double-check the save went through.**')
 
-
     settings       = pd.read_json('settings.json')
     available_tabs = list(settings.columns.values)
     tabs           = st.tabs(available_tabs)
