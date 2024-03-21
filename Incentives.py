@@ -562,28 +562,3 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     
     with open('incentives.zip','rb') as error_file:
         st.download_button('DOWNLOAD PAYROLL FILE', data=error_file, file_name='Incentives_'+str(start)+'_'+str(end)+'.zip', type='primary', use_container_width=True)
-    
-
-    # final = pd.concat(summary)
-    # final = final.reset_index()
-    # final = final.rename(columns={'index': 'Role'})
-    # final = final[['Department','Role','People','Bonus Due','Bonus Divided Equally']]
-    # final = final[final['Bonus Due'] > 0]
-    
-    # st.download_button('DOWNLOAD PAYROLL FILE', data=final.to_csv(index=False), file_name='Incentives_'+str(start)+'_'+str(end)+'.csv', mime='csv', type='primary', use_container_width=True)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    # final = pd.concat(summary)
-    # final = final.reset_index()
-    # final = final.rename(columns={'index': 'Role'})
-    # final = final[['Department','Role','People','Bonus Due','Bonus Divided Equally']]
-    # final = final[final['Bonus Due'] > 0]
-    
-    # st.download_button('DOWNLOAD PAYROLL FILE', data=final.to_csv(index=False), file_name='Incentives_'+str(start)+'_'+str(end)+'.csv', mime='csv', type='primary', use_container_width=True)
