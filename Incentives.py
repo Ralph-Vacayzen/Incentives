@@ -14,8 +14,8 @@ st.info('Loving the crew. Giving them an extra buck or two. Hoping above and bey
 
 l, r = st.columns(2)
 
-start = l.date_input('Start of Period')
-end   = r.date_input('End of Period', min_value=start)
+start = l.date_input('Start of Period', value=pd.to_datetime('today')-pd.Timedelta(days=1), max_value=pd.to_datetime('today')-pd.Timedelta(days=1))
+end   = r.date_input('End of Period',   value=pd.to_datetime('today')-pd.Timedelta(days=1), max_value=pd.to_datetime('today')-pd.Timedelta(days=1), min_value=start)
 
 settings = pd.read_json('settings.json')
 
