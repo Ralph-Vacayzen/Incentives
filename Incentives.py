@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import openpyxl
+import zipfile
+import os
 
 
 st.set_page_config(page_title='Incentives', page_icon='💰', layout="wide", initial_sidebar_state="auto", menu_items=None)
@@ -522,18 +524,22 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
 
 
 
-    with pd.ExcelWriter('errors.xlsx') as errors:
-        LSV[LSV['isError']].to_excel(errors, sheet_name='LSV',   index=False)
-        B2B[B2B['isError']].to_excel(errors, sheet_name='B2B',   index=False)
-        B2C[B2C['isError']].to_excel(errors, sheet_name='B2C',   index=False)
-        bso[bso['isError']].to_excel(errors, sheet_name='BEACH', index=False)
-    
+    errors = [
+        [LSV[LSV['isError']],'LSV'],
+        [B2B[B2B['isError']],'B2B'],
+        [B2C[B2C['isError']],'B2C'],
+        [bso[bso['isError']],'BEACH']
+    ]
 
-    with open('errors.xlsx', 'rb') as error_file:
-        st.download_button('DOWNLOAD ERRORS FILE', data=error_file, file_name='Errors_'+str(start)+'_'+str(end)+'.xls', type='secondary', use_container_width=True)
+    with zipfile.ZipFile('errors.zip', 'w') as zip:
+        for error in errors:
+            error[0].to_csv(f'{error[1]}.csv', index=False)
+            zip.write(f'{error[1]}.csv')
+            os.remove(f'{error[1]}.csv')
     
     
-
+    with open('errors.zip','rb') as error_file:
+        st.download_button('DOWNLOAD ERRORS FILE', data=error_file, file_name='Errors_'+str(start)+'_'+str(end)+'.zip', type='secondary', use_container_width=True)
 
 
 
