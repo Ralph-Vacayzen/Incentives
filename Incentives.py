@@ -320,78 +320,34 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
             'disbursement':     {}
         }
     }
+    
+    
+    
+    
+    
+    
+    
 
-    for department in dispatch:
-        for bucket in settings[department]['BUDGET']['Success Rate to Bonus Pool']:
-            if bucket[0] >= dispatch[department]['efficiency'] and dispatch[department]['efficiency'] >= bucket[1]:
-                dispatch[department]['bonus_percentage'] = bucket[2]
-                break
-    
-    for department in dispatch:
-        max_bonus = 0
-        dates = pd.date_range(start, end)
-        
-        for day in dates:
-            
-            for bucket in settings[department]['BUDGET']['Max Bonus Pool Bucket']:
-                startDate = pd.to_datetime(bucket[0]).date()
-                endDate   = pd.to_datetime(bucket[1]).date()
-                days      = (endDate - startDate).days + 1
-                dailyRate = bucket[2] / days
-
-                if startDate <= day.date() and day.date() <= endDate:
-                    max_bonus += dailyRate
-                    break
-        
-        dispatch[department]['max_bonus'] = round(max_bonus,2)
-        dispatch[department]['calculated_bonus'] = dispatch[department]['max_bonus'] * dispatch[department]['bonus_percentage']
-    
-    for department in dispatch:
-        dispatch[department]['disbursement'] = dict()
-        for role in settings[department]['STAFF']['Role to Number in Role to Disbursement']:
-            title   = role[0]
-            people  = role[1]
-            portion = role[2]
-
-            dispatch[department]['disbursement'][title] = [
-                float(people),
-                (dispatch[department]['calculated_bonus'] * portion),
-                (dispatch[department]['calculated_bonus'] * portion) / float(people)
-                ]
-            
-    for department in dispatch:
-        df = pd.DataFrame(dispatch[department]['disbursement']).transpose()
-        df.columns = ['People','Bonus Due','Bonus Divided Equally']
-        df['Department'] = department
-        summary.append(df)
-
-    
-    
-    
-    
-    
-    
-    
 
 
     # SECTION: SALES, STOREFRONT
     
-    # OFFICE
+    # OFFICE (INTEGRARENTAL)
         
     dp['PaymentDate']   = pd.to_datetime(dp['PaymentDate']).dt.date
     dp                  = dp[(dp.PaymentDate >= start) & (dp.PaymentDate <= end)]
-
-    # SEAGROVE (SHOPIFY)
-
-    dss['Date']         = dss['Date'].str[:10]
-    dss['Date']         = pd.to_datetime(dss['Date']).dt.date
-    dss                 = dss[(dss.Date >= start) & (dss.Date <= end)]
 
     # BAYBAITS (CLOVER)
 
     bbs['Payment Date'] = bbs['Payment Date'].str[:11]
     bbs['Payment Date'] = pd.to_datetime(bbs['Payment Date']).dt.date
     bbs                 = bbs[(bbs['Payment Date'] >= start) & (bbs['Payment Date'] <= end)]
+
+    # SEAGROVE (SHOPIFY)
+
+    dss['Date']         = dss['Date'].str[:10]
+    dss['Date']         = pd.to_datetime(dss['Date']).dt.date
+    dss                 = dss[(dss.Date >= start) & (dss.Date <= end)]
 
 
     sales = {
@@ -493,7 +449,10 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
             with st.container(border=True):
                 l, m, r = st.columns(3)
                 l.metric('Required Stops',           dispatch[department]['required'])
-                m.metric('Additional (Error) Stops', dispatch[department]['error'])
+                dispatch[department]['error'] = m.number_input('Additional (Error) Stops', value=dispatch[department]['error'], key=str(department)+str(dispatch))
+
+                dispatch[department]['efficiency'] = (1 - (dispatch[department]['error'] / dispatch[department]['required'])) * 100
+
                 r.metric('**Efficiency**',           round(dispatch[department]['efficiency'],2))
         
         for department in sales:
@@ -504,6 +463,50 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
                 m.metric('Incentive Threshold', round(sales[department]['incentive_threshold'],2))
                 r.metric('Transations',         round(sales[department]['transactions'],2), round(sales[department]['transactions'] - sales[department]['incentive_threshold'],2))
     
+
+    for department in dispatch:
+        for bucket in settings[department]['BUDGET']['Success Rate to Bonus Pool']:
+            if bucket[0] >= dispatch[department]['efficiency'] and dispatch[department]['efficiency'] >= bucket[1]:
+                dispatch[department]['bonus_percentage'] = bucket[2]
+                break
+    
+    for department in dispatch:
+        max_bonus = 0
+        dates = pd.date_range(start, end)
+        
+        for day in dates:
+            
+            for bucket in settings[department]['BUDGET']['Max Bonus Pool Bucket']:
+                startDate = pd.to_datetime(bucket[0]).date()
+                endDate   = pd.to_datetime(bucket[1]).date()
+                days      = (endDate - startDate).days + 1
+                dailyRate = bucket[2] / days
+
+                if startDate <= day.date() and day.date() <= endDate:
+                    max_bonus += dailyRate
+                    break
+        
+        dispatch[department]['max_bonus'] = round(max_bonus,2)
+        dispatch[department]['calculated_bonus'] = dispatch[department]['max_bonus'] * dispatch[department]['bonus_percentage']
+    
+    for department in dispatch:
+        dispatch[department]['disbursement'] = dict()
+        for role in settings[department]['STAFF']['Role to Number in Role to Disbursement']:
+            title   = role[0]
+            people  = role[1]
+            portion = role[2]
+
+            dispatch[department]['disbursement'][title] = [
+                float(people),
+                (dispatch[department]['calculated_bonus'] * portion),
+                (dispatch[department]['calculated_bonus'] * portion) / float(people)
+                ]
+            
+    for department in dispatch:
+        df = pd.DataFrame(dispatch[department]['disbursement']).transpose()
+        df.columns = ['People','Bonus Due','Bonus Divided Equally']
+        df['Department'] = department
+        summary.append(df)
     
 
 
