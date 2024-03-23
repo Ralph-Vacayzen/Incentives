@@ -26,7 +26,9 @@ with st.expander('Uploaded Files'):
         ['Incentive_Payments.csv','An integraRental database report, Incentive_Payments.'],
         ['Incentive_Beach.csv','An integraRental database report, Incentive_Beach.'],
         ['Incentive_Beach_Seasonals.csv','A tab from a Google Sheet, Beach Service Seasonals.'],
-        ['Incentive_House_Agreements.csv','A Partner Program Register (PPR) report, House Agreements - All - B2B.']
+        ['Incentive_House_Agreements.csv','A Partner Program Register (PPR) report, House Agreements - All - B2B.'],
+        ['Incentive_Seagrove.csv','A Shopify report: Total Sales, filtered Year to Date.'],
+        ['Incentive_Baybaits.csv','A Clover report: Transactions > Payments > EXPORT PAYMENTS FROM THIS PAGE.']
     ]
 
     files = {
@@ -34,7 +36,9 @@ with st.expander('Uploaded Files'):
         'Incentive_Payments.csv': None,
         'Incentive_House_Agreements.csv': None,
         'Incentive_Beach.csv': None,
-        'Incentive_Beach_Seasonals.csv': None
+        'Incentive_Beach_Seasonals.csv': None,
+        'Incentive_Seagrove.csv': None,
+        'Incentive_Baybaits.csv': None
     }
 
 
@@ -78,6 +82,8 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     dp      = pd.read_csv(uploaded_files[files['Incentive_Payments.csv']])
     bso     = pd.read_csv(uploaded_files[files['Incentive_Beach.csv']])
     bss     = pd.read_csv(uploaded_files[files['Incentive_Beach_Seasonals.csv']])
+    dss     = pd.read_csv(uploaded_files[files['Incentive_Seagrove.csv']])
+    bbs     = pd.read_csv(uploaded_files[files['Incentive_Baybaits.csv']])
     summary = []
 
 
@@ -370,8 +376,23 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
 
     # SECTION: SALES, STOREFRONT
     
-    dp['PaymentDate'] = pd.to_datetime(dp['PaymentDate']).dt.date
-    dp                = dp[(dp.PaymentDate >= start) & (dp.PaymentDate <= end)]
+    # OFFICE
+        
+    dp['PaymentDate']   = pd.to_datetime(dp['PaymentDate']).dt.date
+    dp                  = dp[(dp.PaymentDate >= start) & (dp.PaymentDate <= end)]
+
+    # SEAGROVE (SHOPIFY)
+
+    dss['Date']         = dss['Date'].str[:10]
+    dss['Date']         = pd.to_datetime(dss['Date']).dt.date
+    dss                 = dss[(dss.Date >= start) & (dss.Date <= end)]
+
+    # BAYBAITS (CLOVER)
+
+    bbs['Payment Date'] = bbs['Payment Date'].str[:11]
+    bbs['Payment Date'] = pd.to_datetime(bbs['Payment Date']).dt.date
+    bbs                 = bbs[(bbs['Payment Date'] >= start) & (bbs['Payment Date'] <= end)]
+
 
     sales = {
         'SALES': {
@@ -383,7 +404,7 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
             'disbursement':        {}
             },
         'BAY BAITS': {
-            'transactions':        0,
+            'transactions':        np.sum(bbs.Amount),
             'budgeted_sales':      0,
             'incentive_threshold': 0,
             'bucket':              0,
@@ -391,7 +412,7 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
             'disbursement':        {}
             },
         'SEAGROVE': {
-            'transactions':        0,
+            'transactions':        np.sum(dss['Total sales']),
             'budgeted_sales':      0,
             'incentive_threshold': 0,
             'bucket':              0,
@@ -452,7 +473,15 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
 
 
     with st.expander('**Transactions**'):
+
+        'OFFICE'
         st.dataframe(dp, use_container_width=True, hide_index=True)
+
+        'BAY BAITS'
+        st.dataframe(bbs, use_container_width=True, hide_index=True)
+
+        'BAY BAITS @ SEAGROVE'
+        st.dataframe(dss, use_container_width=True, hide_index=True)
 
     
 
