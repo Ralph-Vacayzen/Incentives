@@ -130,6 +130,17 @@
         "BIKE CHECK - OWNER ARRIVAL",
         "DELIVERY",
         "POINTE ARRIVAL"
+      ],
+      "SPECIFIC": [
+        "BACKPACK & BIKE CHECK",
+        "BACKPACK & BIKE CHECK - OWNER ARRIVAL",
+        "BIKE AUDIT",
+        "BIKE CHECK",
+        "BIKE CHECK - ALAYA",
+        "BIKE CHECK - OWNER ARRIVA",
+        "BIKE CHECK - OWNER ARRIVAL",
+        "POINTE ARRIVAL",
+        "POINTE DEPARTURE"
       ]
     }
   },

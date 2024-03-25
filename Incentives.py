@@ -104,11 +104,12 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
         return (row.Product == 'Golf Cart Rentals') or (row.DeliverOrPickupToType in settings['LSV']['DISPATCH']['SPECIFIC'])
 
     def IsB2B(row):
-        isNotBS           = not (row.isBS)
-        isNotLSV          = not (row.isLSV)
-        isOnHouseProgram  = row.RentalAgreementID in dha['RentalAgreementID'].to_list()
+        isNotBS          = not (row.isBS)
+        isNotLSV         = not (row.isLSV)
+        isOnHouseProgram = row.RentalAgreementID in dha['RentalAgreementID'].to_list()
+        isB2BSpecific    = row.DeliverOrPickupToType in settings['B2B']['DISPATCH']['SPECIFIC']
 
-        return isNotBS and isNotLSV and isOnHouseProgram
+        return isNotBS and isNotLSV and (isOnHouseProgram or isB2BSpecific)
     
     def IsB2C(row):
         return not (row.isBS or row.isLSV or row.isB2B)
