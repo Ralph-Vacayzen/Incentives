@@ -342,33 +342,14 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     dp                  = dp[(dp.PaymentDate >= start) & (dp.PaymentDate <= end)]
 
     # BAYBAITS (CLOVER)
-
-    # def GetMonthFromAbbreviation(abbreviation):
-    #     match abbreviation:
-    #         case 'Jan':
-    #             return '01'
-    #         case 'Feb':
-    #             return '02'
-    #         case 'Mar':
-    #             return '03'
-
-
-    # def ConvertCloverDateToDate(row):
-    #     date = row['Payment Date'].str[:11]
-    #     date = str(date)
-    #     parts = date.split('-')
-
     
     def ConvertCloverDateToDate(row):
-        date = row['Payment Date'].str[:11]
+        date = row['Payment Date'][:11]
         date = datetime.strptime(date, '%d-%b-%Y')
 
         return date.strftime('%m/%d/%Y')
 
         
-
-
-    # bbs['Payment Date'] = bbs['Payment Date'].str[:11]
     bbs['Payment Date'] = bbs.apply(ConvertCloverDateToDate, axis = 1)
     bbs['Payment Date'] = pd.to_datetime(bbs['Payment Date']).dt.date
     bbs                 = bbs[(bbs['Payment Date'] >= start) & (bbs['Payment Date'] <= end)]
