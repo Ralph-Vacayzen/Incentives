@@ -31,7 +31,7 @@ with st.expander('Uploaded Files'):
         ['Incentive_Beach_Seasonals.csv','A tab from a Google Sheet, Beach Service Seasonals.'],
         ['Incentive_House_Agreements.csv','A Partner Program Register (PPR) report, House Agreements - All - B2B.'],
         ['Incentive_Seagrove.csv','A Shopify report: Total Sales, filtered Year to Date.'],
-        ['Incentive_Baybaits.csv','A Clover report: Transactions > Payments > EXPORT PAYMENTS FROM THIS PAGE.']
+        ['Incentive_Baybaits.csv','A Shopify report: Total Sales, filtered Year to Date.']
     ]
 
     files = {
@@ -155,7 +155,7 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
 
         if department == None: return False
 
-        return row.DeliverOrPickupToType in settings[department]['DISPATCH']['REQUIRED']
+        return (row.DeliverOrPickupToType in settings[department]['DISPATCH']['REQUIRED'])
 
     def IsAdditionalWork(row):
 
@@ -341,18 +341,24 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     dp['PaymentDate']   = pd.to_datetime(dp['PaymentDate']).dt.date
     dp                  = dp[(dp.PaymentDate >= start) & (dp.PaymentDate <= end)]
 
-    # BAYBAITS (CLOVER)
+    # BAYBAITS (CLOVER) (NO LONGER USE)
     
-    def ConvertCloverDateToDate(row):
-        date = row['Payment Date'][:11]
-        date = datetime.strptime(date, '%d-%b-%Y')
+    # def ConvertCloverDateToDate(row):
+    #     date = row['Payment Date'][:11]
+    #     date = datetime.strptime(date, '%d-%b-%Y')
 
-        return date.strftime('%m/%d/%Y')
+    #     return date.strftime('%m/%d/%Y')
 
         
-    bbs['Payment Date'] = bbs.apply(ConvertCloverDateToDate, axis = 1)
-    bbs['Payment Date'] = pd.to_datetime(bbs['Payment Date']).dt.date
-    bbs                 = bbs[(bbs['Payment Date'] >= start) & (bbs['Payment Date'] <= end)]
+    # bbs['Payment Date'] = bbs.apply(ConvertCloverDateToDate, axis = 1)
+    # bbs['Payment Date'] = pd.to_datetime(bbs['Payment Date']).dt.date
+    # bbs                 = bbs[(bbs['Payment Date'] >= start) & (bbs['Payment Date'] <= end)]
+
+    # BAYBAITS (SHOPIFY)
+
+    bbs['Date']         = bbs['Date'].str[:10]
+    bbs['Date']         = pd.to_datetime(bbs['Date']).dt.date
+    bbs                 = bbs[(bbs.Date >= start) & (bbs.Date <= end)]
 
     # SEAGROVE (SHOPIFY)
 
@@ -371,7 +377,7 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
             'disbursement':        {}
             },
         'BAY BAITS': {
-            'transactions':        np.sum(bbs.Amount),
+            'transactions':        np.sum(bbs['Total sales']),
             'budgeted_sales':      0,
             'incentive_threshold': 0,
             'bucket':              0,
