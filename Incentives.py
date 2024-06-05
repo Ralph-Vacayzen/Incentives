@@ -341,19 +341,6 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     dp['PaymentDate']   = pd.to_datetime(dp['PaymentDate']).dt.date
     dp                  = dp[(dp.PaymentDate >= start) & (dp.PaymentDate <= end)]
 
-    # BAYBAITS (CLOVER) (NO LONGER USE)
-    
-    # def ConvertCloverDateToDate(row):
-    #     date = row['Payment Date'][:11]
-    #     date = datetime.strptime(date, '%d-%b-%Y')
-
-    #     return date.strftime('%m/%d/%Y')
-
-        
-    # bbs['Payment Date'] = bbs.apply(ConvertCloverDateToDate, axis = 1)
-    # bbs['Payment Date'] = pd.to_datetime(bbs['Payment Date']).dt.date
-    # bbs                 = bbs[(bbs['Payment Date'] >= start) & (bbs['Payment Date'] <= end)]
-
     # BAYBAITS (SHOPIFY)
 
     bbs['Date']         = bbs['Date'].str[:10]
